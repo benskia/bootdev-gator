@@ -2,7 +2,6 @@ package config
 
 import (
 	"encoding/json"
-	"log"
 	"os"
 	"path"
 
@@ -44,7 +43,6 @@ func Read() (*Config, error) {
 func (cfg *Config) SetUser(username string) error {
 	errTagger := errors.NewErrTagger("SetUser " + username)
 
-	log.Printf("setting user %s\n", username)
 	cfg.CurrentUserName = username
 	if err := writeConfig(*cfg); err != nil {
 		return errTagger(err)
