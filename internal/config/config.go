@@ -23,17 +23,17 @@ func Read() (*Config, error) {
 
 	configPath, err := getConfigFilePath()
 	if err != nil {
-		return nil, errWrap(err)
+		return nil, errWrap("failed to get config filepath", err)
 	}
 
 	data, err := os.ReadFile(configPath)
 	if err != nil {
-		return nil, errWrap(err)
+		return nil, errWrap("failed to read config filed", err)
 	}
 
 	newCfg := Config{}
 	if err := json.Unmarshal(data, &newCfg); err != nil {
-		return nil, errWrap(err)
+		return nil, errWrap("failed to unmarshal data", err)
 	}
 
 	return &newCfg, nil
@@ -65,16 +65,16 @@ func writeConfig(cfg Config) error {
 
 	data, err := json.Marshal(cfg)
 	if err != nil {
-		return errWrap(err)
+		return errWrap("failed to marshal data", err)
 	}
 
 	configFilePath, err := getConfigFilePath()
 	if err != nil {
-		return errWrap(err)
+		return errWrap("failed to get config filepath", err)
 	}
 
 	if err := os.WriteFile(configFilePath, data, 0644); err != nil {
-		return errWrap(err)
+		return errWrap("failed to write config file", err)
 	}
 
 	return nil

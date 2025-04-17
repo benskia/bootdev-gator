@@ -22,11 +22,11 @@ func handlerLogin(s *state, cmd command) error {
 	// Users that don't exist in the database cannot login.
 	username := cmd.Args[0]
 	if _, err := s.db.GetUser(context.Background(), username); err != nil {
-		return errWrap(err)
+		return errWrap("failed GetUser query", err)
 	}
 
 	if err := s.cfg.SetUser(username); err != nil {
-		return errWrap(err)
+		return errWrap("failed SetUser query", err)
 	}
 
 	log.Printf("user set in config: %s\n", username)
@@ -50,7 +50,7 @@ func handlerRegister(s *state, cmd command) error {
 			Name:      username,
 		})
 	if err != nil {
-		return errWrap(err)
+		return errWrap("failed CreateUser query", err)
 	}
 
 	s.cfg.SetUser(username)

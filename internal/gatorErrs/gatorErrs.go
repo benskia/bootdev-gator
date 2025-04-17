@@ -4,8 +4,8 @@ import (
 	"fmt"
 )
 
-func NewErrWrapper(tag string) func(error) error {
-	return func(err error) error {
-		return fmt.Errorf("%s: %w", tag, err)
+func NewErrWrapper(tag string) func(string, error) error {
+	return func(desc string, err error) error {
+		return fmt.Errorf("%s: %s\n\t%w", tag, desc, err)
 	}
 }
