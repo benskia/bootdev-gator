@@ -3,12 +3,17 @@ package main
 import (
 	"context"
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"html"
 	"io"
+	"log"
 	"net/http"
+	"time"
 
+	"github.com/benskia/Gator/internal/database"
 	gatorerrs "github.com/benskia/Gator/internal/gatorErrs"
+	"github.com/google/uuid"
 )
 
 type RSSFeed struct {
@@ -25,6 +30,36 @@ type RSSItem struct {
 	Link        string `xml:"link"`
 	Description string `xml:"description"`
 	PubDate     string `xml:"pubDate"`
+}
+
+func handlerAddfeed(s *state, cmd command) error {
+	errWrap := gatorerrs.NewErrWrapper("handlerAddFeed")
+
+	if len(cmd.Args) < 2 {
+		return errors.New("usage: addfeed <name> <url>")
+	}
+
+	user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
+	if err != nil {
+		return errWrap("failed GetUser query", err)
+	}
+
+	feedName := cmd.Args[0]
+	feedUrl := cmd.Args[1]
+	_, err = s.db.CreateFeed(context.Background(), database.CreateFeedParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Name:      feedName,
+		Url:       feedUrl,
+		UserID:    user.ID,
+	})
+	if err != nil {
+		return errWrap("failed CreateFeed query", err)
+	}
+
+	log.Printf("feed registered in database: [%s](%s)", feedName, feedUrl)
+	return nil
 }
 
 func handlerAgg(s *state, cmd command) error {
