@@ -2,10 +2,11 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path"
 
-	"github.com/benskia/Gator/internal/errors"
+	"github.com/benskia/Gator/internal/gatorErrs"
 )
 
 const configFileName string = ".gatorconfig.json"
@@ -18,21 +19,21 @@ type Config struct {
 
 // Read function    Returns a Config struct that models a json config file.
 func Read() (*Config, error) {
-	errTagger := errors.NewErrTagger("Read " + configFileName)
+	errWrap := gatorerrs.NewErrWrapper("Read")
 
 	configPath, err := getConfigFilePath()
 	if err != nil {
-		return nil, errTagger(err)
+		return nil, errWrap(err)
 	}
 
 	data, err := os.ReadFile(configPath)
 	if err != nil {
-		return nil, errTagger(err)
+		return nil, errWrap(err)
 	}
 
 	newCfg := Config{}
 	if err := json.Unmarshal(data, &newCfg); err != nil {
-		return nil, errTagger(err)
+		return nil, errWrap(err)
 	}
 
 	return &newCfg, nil
@@ -41,45 +42,39 @@ func Read() (*Config, error) {
 // SetUser method    Sets cfg.CurrentUserName to username, and writes the
 // Config to .gatorconfig.json at user's home directory.
 func (cfg *Config) SetUser(username string) error {
-	errTagger := errors.NewErrTagger("SetUser " + username)
-
 	cfg.CurrentUserName = username
 	if err := writeConfig(*cfg); err != nil {
-		return errTagger(err)
+		return fmt.Errorf("SetUser: %w", err)
 	}
-
 	return nil
 }
 
 // getConfigFilePath function    Returns a filepath assuming a config file at
 // user's home directory.
 func getConfigFilePath() (string, error) {
-	errTagger := errors.NewErrTagger("getConfigFilePath")
-
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		return "", errTagger(err)
+		return "", fmt.Errorf("getConfigFilePath: %w", err)
 	}
-
 	return path.Join(homeDir, configFileName), nil
 }
 
 // writeConfig function    Writes cfg to file as json.
 func writeConfig(cfg Config) error {
-	errTagger := errors.NewErrTagger("writeConfig")
+	errWrap := gatorerrs.NewErrWrapper("writeConfig")
 
 	data, err := json.Marshal(cfg)
 	if err != nil {
-		return errTagger(err)
+		return errWrap(err)
 	}
 
 	configFilePath, err := getConfigFilePath()
 	if err != nil {
-		return errTagger(err)
+		return errWrap(err)
 	}
 
 	if err := os.WriteFile(configFilePath, data, 0644); err != nil {
-		return errTagger(err)
+		return errWrap(err)
 	}
 
 	return nil

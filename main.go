@@ -1,14 +1,18 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"os"
 
 	"github.com/benskia/Gator/internal/config"
+	"github.com/benskia/Gator/internal/database"
+	_ "github.com/lib/pq"
 )
 
 type state struct {
 	cfg *config.Config
+	db  *database.Queries
 }
 
 func main() {
@@ -17,13 +21,23 @@ func main() {
 		log.Fatal(err)
 	}
 
-	programState := &state{cfg: cfg}
+	db, err := sql.Open("postgres", cfg.DbUrl)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	dbQueries := database.New(db)
+	programState := &state{cfg: cfg, db: dbQueries}
+
 	commands := commands{registeredCommands: map[string]func(*state, command) error{}}
-	commands.register("login", handlerLogins)
+	commands.register("login", handlerLogin)
+	commands.register("register", handlerRegister)
+	commands.register("reset", handlerReset)
+	commands.register("users", handlerUsers)
 
 	numArgs := len(os.Args)
 	if numArgs < 2 {
-		log.Fatal("expected args: <command name> [additional args...]")
+		log.Fatal("usage: gator <command name> [additional args...]")
 	}
 
 	name := os.Args[1]
