@@ -21,7 +21,7 @@ func handlerLogin(s *state, cmd command) error {
 
 	// Users that don't exist in the database cannot login.
 	username := cmd.Args[0]
-	if _, err := s.db.GetUser(context.Background(), username); err != nil {
+	if _, err := s.db.GetUserByName(context.Background(), username); err != nil {
 		return errWrap("failed GetUser query", err)
 	}
 

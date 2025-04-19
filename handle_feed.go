@@ -39,9 +39,9 @@ func handlerAddfeed(s *state, cmd command) error {
 		return errors.New("usage: addfeed <name> <url>")
 	}
 
-	user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
+	user, err := s.db.GetUserByName(context.Background(), s.cfg.CurrentUserName)
 	if err != nil {
-		return errWrap("failed GetUser query", err)
+		return errWrap("failed GetUserByName query", err)
 	}
 
 	feedName := cmd.Args[0]
@@ -59,6 +59,30 @@ func handlerAddfeed(s *state, cmd command) error {
 	}
 
 	log.Printf("feed registered in database: [%s](%s)", feedName, feedUrl)
+	return nil
+}
+
+func handlerFeeds(s *state, cmd command) error {
+	errWrap := gatorerrs.NewErrWrapper("handlerFeeds")
+
+	feeds, err := s.db.GetFeeds(context.Background())
+	if err != nil {
+		return errWrap("failed GetFeeds query", err)
+	}
+
+	for i, feed := range feeds {
+		user, err := s.db.GetUserByID(context.Background(), feed.UserID)
+		if err != nil {
+			return errWrap("failedGetUserByID", err)
+		}
+
+		fmt.Printf(`Feed %d:
+    Name: %s
+    URL: %s
+    Author: %s
+`, i, feed.Name, feed.Url, user.Name)
+	}
+
 	return nil
 }
 
