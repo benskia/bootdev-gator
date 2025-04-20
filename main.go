@@ -30,14 +30,21 @@ func main() {
 	programState := &state{cfg: cfg, db: dbQueries}
 
 	commands := commands{registeredCommands: map[string]func(*state, command) error{}}
+
+	// User
 	commands.register("login", handlerLogin)
 	commands.register("register", handlerRegister)
 	commands.register("reset", handlerReset)
 	commands.register("users", handlerUsers)
+
+	// Feed
 	commands.register("agg", handlerAgg)
 	commands.register("addfeed", handlerAddfeed)
 	commands.register("feeds", handlerFeeds)
+
+	// Follow
 	commands.register("follow", handlerFollow)
+	commands.register("following", handlerFollowing)
 
 	numArgs := len(os.Args)
 	if numArgs < 2 {

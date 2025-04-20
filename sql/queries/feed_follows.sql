@@ -16,3 +16,11 @@ RETURNING
         WHERE
             id = $5);
 
+-- name: GetFeedFollowsForUser :many
+SELECT
+    *
+FROM
+    feed_follows
+WHERE
+    user_id = $1;
+

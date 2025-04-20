@@ -12,6 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// handlerLogin() sets the current user if they exist in the database (by name).
 func handlerLogin(s *state, cmd command) error {
 	errWrap := gatorerrs.NewErrWrapper("handlerLogin")
 
@@ -33,6 +34,7 @@ func handlerLogin(s *state, cmd command) error {
 	return nil
 }
 
+// handlerRegister() creates a new user in the database with the provided name.
 func handlerRegister(s *state, cmd command) error {
 	errWrap := gatorerrs.NewErrWrapper("handlerRegister")
 
@@ -58,6 +60,7 @@ func handlerRegister(s *state, cmd command) error {
 	return nil
 }
 
+// handlerReset() deletes all users from the database.
 func handlerReset(s *state, cmd command) error {
 	if err := s.db.ResetUsers(context.Background()); err != nil {
 		log.Println("failed to reset users table")
@@ -67,6 +70,7 @@ func handlerReset(s *state, cmd command) error {
 	return nil
 }
 
+// handlerUsers() prints all users that are recorded in the database.
 func handlerUsers(s *state, cmd command) error {
 	users, err := s.db.GetUsers(context.Background())
 	if err != nil {

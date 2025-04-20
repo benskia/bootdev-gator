@@ -32,6 +32,7 @@ type RSSItem struct {
 	PubDate     string `xml:"pubDate"`
 }
 
+// handlerAddfeed() creates a new feed record authored by the current user.
 func handlerAddfeed(s *state, cmd command) error {
 	errWrap := gatorerrs.NewErrWrapper("handlerAddFeed")
 
@@ -62,6 +63,7 @@ func handlerAddfeed(s *state, cmd command) error {
 	return nil
 }
 
+// handlerFeeds() prints the name, URL, and author for all feeds in the database.
 func handlerFeeds(s *state, cmd command) error {
 	errWrap := gatorerrs.NewErrWrapper("handlerFeeds")
 
@@ -86,6 +88,7 @@ func handlerFeeds(s *state, cmd command) error {
 	return nil
 }
 
+// handlerAgg() prints the content received from a feed URL.
 func handlerAgg(s *state, cmd command) error {
 	errWrap := gatorerrs.NewErrWrapper("handlerAgg")
 
@@ -98,6 +101,7 @@ func handlerAgg(s *state, cmd command) error {
 	return nil
 }
 
+// fetchFeed() handles HTTP GET requests that expect an RSSFeed response.
 func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 	errWrap := gatorerrs.NewErrWrapper("fetchFeed")
 
@@ -132,6 +136,8 @@ func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 	return feed, nil
 }
 
+// escapeFeedStrings() resolves HTML escape characters to there normal string
+// value (such as `&quot` to `"`).
 func escapeFeedStrings(feed *RSSFeed) {
 	feed.Channel.Title = html.EscapeString(feed.Channel.Title)
 	feed.Channel.Description = html.EscapeString(feed.Channel.Description)

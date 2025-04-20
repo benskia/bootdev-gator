@@ -11,13 +11,12 @@ import (
 
 const configFileName string = ".gatorconfig.json"
 
-// Config struct    Models a json config file.
 type Config struct {
 	DbUrl           string `json:"db_url"`
 	CurrentUserName string `json:"current_user_name"`
 }
 
-// Read function    Returns a Config struct that models a json config file.
+// Read() function    Returns a Config struct that models a json config file.
 func Read() (*Config, error) {
 	errWrap := gatorerrs.NewErrWrapper("Read")
 
@@ -39,7 +38,7 @@ func Read() (*Config, error) {
 	return &newCfg, nil
 }
 
-// SetUser method    Sets cfg.CurrentUserName to username, and writes the
+// SetUser() method    Sets cfg.CurrentUserName to username, and writes the
 // Config to .gatorconfig.json at user's home directory.
 func (cfg *Config) SetUser(username string) error {
 	cfg.CurrentUserName = username
@@ -49,7 +48,7 @@ func (cfg *Config) SetUser(username string) error {
 	return nil
 }
 
-// getConfigFilePath function    Returns a filepath assuming a config file at
+// getConfigFilePath() function    Returns a filepath assuming a config file at
 // user's home directory.
 func getConfigFilePath() (string, error) {
 	homeDir, err := os.UserHomeDir()
@@ -59,7 +58,7 @@ func getConfigFilePath() (string, error) {
 	return path.Join(homeDir, configFileName), nil
 }
 
-// writeConfig function    Writes cfg to file as json.
+// writeConfig() function    Writes cfg to file as json.
 func writeConfig(cfg Config) error {
 	errWrap := gatorerrs.NewErrWrapper("writeConfig")
 
