@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/benskia/Gator/internal/database"
@@ -45,5 +46,25 @@ func handlerFollow(s *state, cmd command) error {
 
 // handlerFollowing() prints the names of all feeds the current user is following.
 func handlerFollowing(s *state, cmd command) error {
+	errWrap := gatorerrs.NewErrWrapper("handlerFollowing")
+
+	user, err := s.db.GetUserByName(context.Background(), s.cfg.CurrentUserName)
+	if err != nil {
+		return errWrap("failed GetUserByName query", err)
+	}
+
+	follows, err := s.db.GetFeedFollowsForUser(context.Background(), user.ID)
+	if err != nil {
+		return errWrap("failed GetFeedFollowsForUser query", err)
+	}
+
+	for i, follow := range follows {
+		feed, err := s.db.GetFeedByID(context.Background(), follow.FeedID)
+		if err != nil {
+			return errWrap("failed GetFeedByID", err)
+		}
+		fmt.Printf("Feed %d: %s\n", i, feed.Name)
+	}
+
 	return nil
 }

@@ -47,7 +47,7 @@ func handlerAddfeed(s *state, cmd command) error {
 
 	feedName := cmd.Args[0]
 	feedUrl := cmd.Args[1]
-	_, err = s.db.CreateFeed(context.Background(), database.CreateFeedParams{
+	feed, err := s.db.CreateFeed(context.Background(), database.CreateFeedParams{
 		ID:        uuid.New(),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
@@ -58,6 +58,14 @@ func handlerAddfeed(s *state, cmd command) error {
 	if err != nil {
 		return errWrap("failed CreateFeed query", err)
 	}
+
+	_, err = s.db.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		UserID:    user.ID,
+		FeedID:    feed.ID,
+	})
 
 	log.Printf("feed registered in database: [%s](%s)", feedName, feedUrl)
 	return nil
